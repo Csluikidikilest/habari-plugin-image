@@ -4,7 +4,7 @@ This is a plugin which permit Habari to process image.
 
 ## Configuration
 ```json
-        {
+{
   "connectionType": "com.qazima.habari.plugin.image.Plugin",
   "grayscaleParameterName": "(grayscale|gs)",
   "heightParameterName": "(height|h)",

@@ -107,6 +107,8 @@ public class Plugin extends com.qazima.habari.plugin.core.Plugin {
                 int srcWidth = srcBufferedImage.getWidth();
                 int dstHeight = srcBufferedImage.getHeight();
                 int dstWidth = srcBufferedImage.getWidth();
+                int dstAngle = 0;
+                boolean forceRotate = false;
                 boolean forceHeight = false;
                 boolean forceWidth = false;
 
@@ -127,6 +129,12 @@ public class Plugin extends com.qazima.habari.plugin.core.Plugin {
                     forceWidth = true;
                 }
 
+                Optional<String> prmAngle = parameters.keySet().stream().filter(key -> Pattern.compile(getRotateParameterName()).matcher(key).matches()).findFirst();
+                if (prmAngle.isPresent()) {
+                    dstAngle = Integer.parseInt(parameters.get(prmAngle.get()));
+                    forceRotate = true;
+                }
+
                 if(forceHeight && !forceWidth) {
                     dstWidth = dstHeight * srcWidth / srcHeight;
                 }
@@ -137,6 +145,9 @@ public class Plugin extends com.qazima.habari.plugin.core.Plugin {
 
                 BufferedImage dstBufferedImage = new BufferedImage(dstWidth, dstHeight, bufferedImageType);
                 Graphics2D graphics2D = dstBufferedImage.createGraphics();
+                if(forceRotate) {
+                    graphics2D.rotate(Math.toRadians(dstAngle), dstWidth / 2, dstHeight / 2);
+                }
                 graphics2D.drawImage(srcBufferedImage, 0, 0, dstWidth, dstHeight, null);
                 graphics2D.dispose();
 
