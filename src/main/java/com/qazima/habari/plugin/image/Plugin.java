@@ -31,28 +31,8 @@ import java.util.regex.Pattern;
 public class Plugin extends com.qazima.habari.plugin.core.Plugin {
     @Getter
     @Setter
-    @JsonProperty("grayscaleParameterName")
-    private String grayscaleParameterName = "(grayscale|gs)";
-
-    @Getter
-    @Setter
-    @JsonProperty("heightParameterName")
-    private String heightParameterName = "(height|h)";
-
-    @Getter
-    @Setter
-    @JsonProperty("path")
-    private String path = "./";
-
-    @Getter
-    @Setter
-    @JsonProperty("rotateParameterName")
-    private String rotateParameterName = "(rotate|r)";
-
-    @Getter
-    @Setter
-    @JsonProperty("widthParameterName")
-    private String widthParameterName = "(width|w)";
+    @JsonProperty("configuration")
+    private com.qazima.habari.plugin.image.Configuration configuration;
 
     private boolean isNullOrEmpty(String string) {
         return string == null || string.isEmpty();
@@ -89,8 +69,8 @@ public class Plugin extends com.qazima.habari.plugin.core.Plugin {
     }
 
     public int process(HttpExchange httpExchange, Content content) {
-        String localPath = getPath();
-        String remotePath = Pattern.compile(getUri()).matcher(httpExchange.getRequestURI().getPath().replace('/', File.separatorChar)).replaceAll("$2");
+        String localPath = getConfiguration().getPath();
+        String remotePath = Pattern.compile(getConfiguration().getUri()).matcher(httpExchange.getRequestURI().getPath().replace('/', File.separatorChar)).replaceAll("$2");
         String fileName = Path.of(localPath, remotePath).toString();
         String queryString = httpExchange.getRequestURI().getQuery();
 
@@ -112,24 +92,24 @@ public class Plugin extends com.qazima.habari.plugin.core.Plugin {
                 boolean forceHeight = false;
                 boolean forceWidth = false;
 
-                Optional<String> prmGrayscale = parameters.keySet().stream().filter(key -> Pattern.compile(getGrayscaleParameterName()).matcher(key).matches()).findFirst();
+                Optional<String> prmGrayscale = parameters.keySet().stream().filter(key -> Pattern.compile(getConfiguration().getGrayscaleParameterName()).matcher(key).matches()).findFirst();
                 if(prmGrayscale.isPresent()) {
                     bufferedImageType = BufferedImage.TYPE_BYTE_GRAY;
                 }
 
-                Optional<String> prmHeight = parameters.keySet().stream().filter(key -> Pattern.compile(getHeightParameterName()).matcher(key).matches()).findFirst();
+                Optional<String> prmHeight = parameters.keySet().stream().filter(key -> Pattern.compile(getConfiguration().getHeightParameterName()).matcher(key).matches()).findFirst();
                 if (prmHeight.isPresent()) {
                     dstHeight = Integer.parseInt(parameters.get(prmHeight.get()));
                     forceHeight = true;
                 }
 
-                Optional<String> prmWidth = parameters.keySet().stream().filter(key -> Pattern.compile(getWidthParameterName()).matcher(key).matches()).findFirst();
+                Optional<String> prmWidth = parameters.keySet().stream().filter(key -> Pattern.compile(getConfiguration().getWidthParameterName()).matcher(key).matches()).findFirst();
                 if (prmWidth.isPresent()) {
                     dstWidth = Integer.parseInt(parameters.get(prmWidth.get()));
                     forceWidth = true;
                 }
 
-                Optional<String> prmAngle = parameters.keySet().stream().filter(key -> Pattern.compile(getRotateParameterName()).matcher(key).matches()).findFirst();
+                Optional<String> prmAngle = parameters.keySet().stream().filter(key -> Pattern.compile(getConfiguration().getRotateParameterName()).matcher(key).matches()).findFirst();
                 if (prmAngle.isPresent()) {
                     dstAngle = Integer.parseInt(parameters.get(prmAngle.get()));
                     forceRotate = true;
